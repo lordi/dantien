@@ -11,15 +11,13 @@ from pytfd import helpers as h
 def stft(x, w, L=None):
     # L is the overlap, see http://cnx.org/content/m10570/latest/
     N = len(x)
-    #T = len(w)
+    T = len(w)
     if L is None:
         L = N
-    # Zerro pad the window
-    w = h.zeropad(w, N)
     X_stft = []
     points = range(0, N, N//L)
     for i in points:
-        x_subset = h.subset(x, i, N)
+        x_subset = h.subset(x, i, T)
         fft_subset = fft(x_subset * w)
         X_stft.append(fft_subset)
     X_stft = array(X_stft).transpose()
