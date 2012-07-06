@@ -6,7 +6,7 @@ from pytfd import stft
 class GLSpectrogram():
     window_size = 128
     buffer_len = 2048
-    update_rate = 10 # Hz
+    update_rate = 15 # Hz
     series_display_res = 128
     colormap = glumpy.colormap.Hot
 
@@ -33,7 +33,6 @@ class GLSpectrogram():
         l = n + self.window_size * 3
         c = n + self.window_size * 2
         newpart = stft.spectogram(self.series[-l:], np.ones(self.window_size))
-        whole = stft.spectogram(self.series, np.ones(self.window_size))
         self.dat_s[:,-c:] = newpart[:,-c:]
         self.fig_s.redraw()
 
