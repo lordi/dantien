@@ -36,6 +36,7 @@ display graphics and received events.
 import sys
 import numpy as np
 import OpenGL.GL as gl
+import inspect
 from glumpy.window import Window, event, key, mouse, show
 
 
@@ -621,7 +622,8 @@ class Figure(event.EventDispatcher):
             return event.EventDispatcher.event(self.window,*args)
         else:
             # If the event is 'on_idle', we attach it directly to the window
-            if args[0] == 'on_idle' or args[0].__name__ == 'on_idle':
+            if args[0] == 'on_idle' or \
+                    (inspect.isroutine(args[0]) and args[0].__name__ == 'on_idle'):
                 self.window.push_handlers(*args)
             else:
                 return event.EventDispatcher.event(self,*args)
