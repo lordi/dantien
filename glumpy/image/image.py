@@ -210,7 +210,7 @@ class Image(object):
         #    t=0,1
         #else:
         #    t=1,0
-        gl.glEnable( self._texture.target )
+        #gl.glEnable( self._texture.target )
         gl.glEnable( gl.GL_BLEND )
         gl.glColor( 1, 1, 1, 1 )
         gl.glBindTexture( self._texture.target, self._texture.id )
