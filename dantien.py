@@ -25,13 +25,20 @@ def dantien(feed_func, layout, update_rate=20):
     glumpy.show()
 
 if __name__ == '__main__':
-    from views import Cube, Spectrogram, SeriesPlot, FFTPlot
+    import sys
+    from views import Cube, Spectrogram, SeriesPlot, FFTPlot, SpectrogramAxis
     from model import TimeSeries
-    from feeders import random_sinoids, random_positive_sinoids
+    import feeders
 
-    dantien(random_positive_sinoids, layout=[
-            [SeriesPlot],
-            [Spectrogram],
-            [FFTPlot]
-        ])
+    if len(sys.argv) >= 2 and sys.argv[1] == '--spectrogram-only':
+        layout = [
+            [SpectrogramAxis, Spectrogram]
+        ]
+    else:
+        layout = [
+            [FFTPlot, SeriesPlot],
+            [SpectrogramAxis, Spectrogram],
+        ]
+
+    dantien(feeders.random_sinoids, layout)
 
