@@ -4,7 +4,7 @@ or more precisely the Discrete Time and Frequency STFT.
 from __future__ import division
 
 from numpy import *
-from numpy.fft import fft
+from scipy.fftpack import rfft
 
 from pytfd import helpers as h
 
@@ -18,7 +18,7 @@ def stft(x, w, L=None):
     points = range(0, N, N//L)
     for i in points:
         x_subset = h.subset(x, i, T)
-        fft_subset = fft(x_subset * w)
+        fft_subset = rfft(x_subset * w)
         X_stft.append(fft_subset)
     X_stft = array(X_stft).transpose()
     return X_stft
