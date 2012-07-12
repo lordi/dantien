@@ -27,9 +27,9 @@ def dantien(feed_func, layout, update_rate=20):
 if __name__ == '__main__':
     from views import Cube, Spectrogram, SeriesPlot, FFTPlot
     from model import TimeSeries
-    from feeders import random_sinoids
+    from feeders import random_sinoids, random_positive_sinoids
 
-    dantien(random_sinoids, layout=[
+    dantien(random_positive_sinoids, layout=[
             [SeriesPlot],
             [Spectrogram],
             [FFTPlot]
