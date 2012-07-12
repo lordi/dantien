@@ -52,6 +52,34 @@ class FFTPlot(Plot):
     def get_series(self):
         return self.ts.dat_s[:,-1]
 
+
+from glfreetype import glFreeType
+
+class SpectrogramAxis(object):
+    colormap = glumpy.colormap.Hot
+    text_vertical_dist = 25.0
+    text_size = 14
+
+    def __init__(self, fig, ts, size=0.5, colormap=None):
+        self.fig = fig
+        self.ts = ts
+        if not colormap is None: self.colormap = colormap
+        self.font = glFreeType.font_data ("glfreetype/test.ttf", self.text_size)
+        self.window_len = self.ts.dat_s.shape[1]
+        self.freqs = np.fft.fftfreq(self.window_len, 1/33.0)[:self.window_len/2]
+
+        self.fig.push(self)
+
+    def on_draw(self):
+        self.fig.lock()
+        self.fig.clear(0.,0.,0.,1)
+        gl.glLoadIdentity ()
+
+        for i in np.arange(0.,1.,self.text_vertical_dist/self.fig.height):
+            freq = self.freqs[int(i*self.window_len/2)]
+            self.font.glPrint (self.fig.width-100, self.fig.height * i, "{0:.2f} Hz".format(freq))
+        self.fig.unlock()
+
 class Spectrogram(object):
     colormap = glumpy.colormap.Hot
 
