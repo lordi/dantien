@@ -14,6 +14,7 @@ class TimeSeries():
         self.series = np.zeros(self.buffer_len)
         self.dat_s = np.zeros((self.window_size, self.buffer_len))
         self.feed_func = feed_func
+        self.window = np.ones(self.window_size)
 
     def eat(self):
         newdata = self.feed_func()
@@ -25,7 +26,9 @@ class TimeSeries():
         self.dat_s = np.roll(self.dat_s, -n)
         l = n + self.window_size * 3
         c = n + self.window_size * 2
-        newpart = stft.spectogram(self.series[-l:], np.ones(self.window_size))
+        newpart = stft.spectogram(self.series[-l:], self.window)
+        newpart = np.clip(newpart, 0.0, 2.0)
+        newpart = np.flipud(newpart) # TODO: do this during the visualisation
         self.dat_s[:,-c:] = newpart[:,-c:]
 
 if __name__ == '__main__':
