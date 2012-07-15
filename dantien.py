@@ -40,5 +40,5 @@ if __name__ == '__main__':
             [SpectrogramAxis, Spectrogram],
         ]
 
-    dantien(feeders.random_sinoids, layout)
+    dantien(feeders.modeeg(), layout)
 
