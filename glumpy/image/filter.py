@@ -257,7 +257,7 @@ class Filter(object):
             gl.glTexParameterf (gl.GL_TEXTURE_1D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
             gl.glTexParameterf (gl.GL_TEXTURE_1D, gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP)
             gl.glTexParameterf (gl.GL_TEXTURE_1D, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP)
-            gl.glTexImage1D (gl.GL_TEXTURE_1D,  0, gl.GL_ALPHA32F_ARB,
+            gl.glTexImage1D (gl.GL_TEXTURE_1D,  0, gl.GL_ALPHA16,
                              kernel.size, 0, gl.GL_ALPHA, gl.GL_FLOAT, kernel)
 
             
