@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#
+#	Usage: rec-modeeg [device-file]
+#
+#       Records modularEEG 256Hz output from the given device file (or
+#       /dev/ttyS0 if not specified) and saves it in a temporary file
+#       'temp.dat'.  Runs BWView in 'follow' mode to watch this data
+#       as it comes in.  When BWView exits, the recording is stopped.
+#
+#	The file remains, in case the user wishes to save it.
+#
+#   Note: Original file take from bwview
+#
+
+DEV=/dev/ttyUSB0
+[ ! -z "$1" ] && DEV=$1
+
+stty -F $DEV sane 57600 intr undef quit undef \
+    erase undef kill undef eof undef eol undef eol2 \
+    undef start undef stop undef susp undef rprnt undef \
+    werase undef lnext undef flush undef min 1 time 0 \
+    ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig \
+    -icanon -iexten -echo -echoe -echok -echoctl -echoke
+
+cat $DEV
+exit 0

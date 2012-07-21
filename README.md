@@ -13,14 +13,14 @@ Example modEEG call:
 
     $ cat recorded_eeg.dat | ./dantien.py --modeeg
 
-Example live modEEG call (not yet):
+Example live modEEG call:
 
-    $ ./collect-openeeg.py /dev/ttyUSB0 | ./dantien.py --modeeg
+    $ ./utils/rec-modeeg | ./dantien.py --modeeg
 
-Of course, it can be routed over the network (for example, if you want to read the data on a portable computer that is not connected to the mains supply) (not yet):
+Of course, it can be routed over the network (for example, if you want to read the data on a portable computer that is not connected to the mains supply):
 
     visualizer$ nc -l -p 12000 | ./dantien.py --modeeg
-    collector$ ./collect-openeeg.py | nc visualizer 12000
+    collector$ ./utils/rec-modeeg | nc visualizer 12000
 
 
 Requirements
