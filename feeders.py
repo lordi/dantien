@@ -33,11 +33,11 @@ def stdin():
 MODEEG_PKTLEN = 17
 MODEEG_SYNC = (0xa5, 0x5a, 0x02)
 
-def modeeg():
+def mk_modeeg(f):
     """
-    Read raw ModEEG data from stdin
+    Return a feeder function that spits out raw ModEEG data from any
+    file-like object f.
     """
-    f = sys.stdin
     _set_non_blocking(f)
     inbuf = io.open(f.fileno(), mode='rb', closefd=False)
     def stdin_read():
@@ -53,7 +53,6 @@ def modeeg():
                 inbuf.read(1)
                 continue
             x.append(info)
-        print len(x), leftover
         # TODO: BufferedReader what?! make use of leftover!
         return [(info[4] - 512) / 1024.0 for info in x[:300]]
     return stdin_read

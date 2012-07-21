@@ -31,16 +31,16 @@ if __name__ == '__main__':
     from model import TimeSeries
     import feeders
 
-    if len(sys.argv) >= 2 and sys.argv[1] == '--spectrogram-only':
-        layout = [
-            [SpectrogramAxis, Spectrogram]
-        ]
+    if len(sys.argv) >= 2 and sys.argv[1] == '--modeeg':
+        feed = feeders.mk_modeeg(sys.stdin) # read modeeg data from stdin
     else:
-        layout = [
-            [FFTPlot, SeriesPlot],
-            [_, Spectrogram],
-            [_, Scaleogram],
-        ]
+        feed = feeders.random_positive_sinoids
 
-    dantien(feeders.modeeg(), layout)
+    layout = [
+        [FFTPlot, SeriesPlot],
+        [_, Spectrogram],
+        [_, Scaleogram],
+    ]
+
+    dantien(feed, layout)
 
