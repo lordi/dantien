@@ -9,15 +9,25 @@ import OpenGL.GL as gl
 from glumpy import figure, show, Trackball
 from glumpy.graphics import VertexBuffer
 
-class Plot(object):
+THEME_BG = (0.01, 0.03, 0.05, 1)
+THEME_FG = (0.0, 0.4, 0.8, 1)
+
+class BaseView(object):
     def __init__(self, fig, ts, size=0.5):
         self.ts = ts
         self.fig = fig
         self.fig.push(self)
 
+class Blank(BaseView):
     def on_draw(self):
         self.fig.lock()
-        self.fig.clear(.85,.85,.85,1)
+        self.fig.clear(*THEME_BG)
+        self.fig.unlock()
+
+class Plot(BaseView):
+    def on_draw(self):
+        self.fig.lock()
+        self.fig.clear(*THEME_BG)
 
         ds = self.get_series()
         if ds is None: return
@@ -31,7 +41,7 @@ class Plot(object):
         gl.glMatrixMode(gl.GL_MODELVIEW)
         gl.glLoadIdentity()
 
-        gl.glColor( 0.0, 0.4, 0.4, 0.5 )
+        gl.glColor(*THEME_FG)
         gl.glBegin(gl.GL_QUADS)
         for i in range(cnt):
             gl.glVertex3f(i+0.5,0,0)
@@ -42,10 +52,12 @@ class Plot(object):
 
         self.fig.unlock()
 
+
 class SeriesPlot(Plot):
     min, max = -1, 1
     def get_series(self):
         return self.ts.series
+
 
 class FFTPlot(Plot):
     min, max = 0, 30
@@ -55,7 +67,7 @@ class FFTPlot(Plot):
 
 from glfreetype import glFreeType
 
-class SpectrogramAxis(object):
+class SpectrogramAxis(BaseView):
     colormap = glumpy.colormap.Hot
     text_vertical_dist = 25.0
     text_size = 14
@@ -72,13 +84,14 @@ class SpectrogramAxis(object):
 
     def on_draw(self):
         self.fig.lock()
-        self.fig.clear(0.,0.,0.,1)
+        self.fig.clear(*THEME_BG)
         gl.glLoadIdentity ()
 
         for i in np.arange(0.,1.,self.text_vertical_dist/self.fig.height):
             freq = self.freqs[int(i*self.window_len/2)]
             self.font.glPrint (self.fig.width-100, self.fig.height * i, "{0:.2f} Hz".format(freq))
         self.fig.unlock()
+
 
 class Spectrogram(object):
     colormap = glumpy.colormap.Hot
@@ -91,14 +104,36 @@ class Spectrogram(object):
 
     def on_draw(self):
         self.fig.lock()
-        self.fig.clear(.25,.85,.85,1)
+        self.fig.clear(*THEME_BG)
         if self.ts.dat_s != None:
             self.img_s = glumpy.image.Image(self.ts.dat_s.astype(np.float32), colormap=self.colormap)
             self.img_s.update()
             self.img_s.draw( x=0, y=0, z=0, width=self.fig.width, height=self.fig.height )
         self.fig.unlock()
 
-class Cube(object):
+
+class Scaleogram(BaseView):
+    colormap = glumpy.colormap.IceAndFire
+
+    def __init__(self, fig, ts, size=0.5, colormap=None):
+        self.fig = fig
+        self.ts = ts
+        if not colormap is None: self.colormap = colormap
+        self.fig.push(self)
+
+    def on_draw(self):
+        self.fig.lock()
+        self.fig.clear(*THEME_BG)
+        if self.ts.dat_s != None:
+            self.img_s = glumpy.image.Image(self.ts.dat_w.astype(np.float32), 
+                    interpolation='bilinear',
+                    colormap=self.colormap)
+            self.img_s.update()
+            self.img_s.draw( x=0, y=0, z=0, width=self.fig.width, height=self.fig.height )
+        self.fig.unlock()
+
+
+class Cube(BaseView):
     " Cube from glumpy demo "
     def __init__(self, fig, ts, size=0.5):
         s = size
@@ -132,7 +167,7 @@ class Cube(object):
 
     def on_draw(self):
         self.fig.lock()
-        self.fig.clear(.85,.85,.85,1)
+        self.fig.clear(*THEME_BG)
         self.trackball.push()
         gl.glEnable( gl.GL_BLEND )
         gl.glEnable( gl.GL_LINE_SMOOTH )
