@@ -9,7 +9,7 @@ from pytfd import stft
 
 class TimeSeries():
     window_size = 64
-    buffer_len = 256
+    buffer_len = 512
 
     def __init__(self, feed_func):
         # Actual time series buffer
@@ -37,7 +37,7 @@ class TimeSeries():
     def update_w(self, n):
         " Update wavelet transform data "
         level = 5
-        wp = pywt.WaveletPacket(self.series, 'db2', 'sym', maxlevel=level)
+        wp = pywt.WaveletPacket(self.series, 'coif2', 'sym', maxlevel=level)
         nodes = wp.get_level(level, order='freq')
         values = np.abs(np.array([nx.data for nx in nodes]))
         self.dat_w = np.clip(values, 0.0, 0.3)
