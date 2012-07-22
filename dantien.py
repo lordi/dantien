@@ -27,7 +27,7 @@ def dantien(feed_func, layout, update_rate=20):
 if __name__ == '__main__':
     import sys
     from views import Cube, Spectrogram, SeriesPlot, FFTPlot, \
-            SpectrogramAxis, Scaleogram, Blank as _
+            Spectrogram3D, Scaleogram, Blank as _
     from model import TimeSeries
     import feeders
 
@@ -38,8 +38,8 @@ if __name__ == '__main__':
 
     layout = [
         [FFTPlot, SeriesPlot],
-        [_, Spectrogram],
-        [_, Scaleogram],
+        [Spectrogram3D, Spectrogram],
+        [Spectrogram3D, Scaleogram],
     ]
 
     dantien(feed, layout)

@@ -5,6 +5,7 @@ Dantien view components: Plots, Spectrograms, ...
 import numpy as np
 import glumpy
 import OpenGL.GL as gl
+import OpenGL.GLU as glu
 
 from glumpy import figure, show, Trackball
 from glumpy.graphics import VertexBuffer
@@ -109,6 +110,29 @@ class Spectrogram(object):
             self.img_s = glumpy.image.Image(self.ts.dat_s.astype(np.float32), colormap=self.colormap)
             self.img_s.update()
             self.img_s.draw( x=0, y=0, z=0, width=self.fig.width, height=self.fig.height )
+        self.fig.unlock()
+
+
+class Spectrogram3D(Spectrogram):
+    def on_draw(self):
+        self.fig.lock()
+        self.fig.clear(*THEME_BG)
+        spect = self.ts.dat_s.astype(np.float32)
+
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        gl.glLoadIdentity()
+        glu.gluPerspective(400.0, self.fig.width / float(self.fig.height), .01, 10000)
+        gl.glRotate(-90.,.0,0.0,1.0)
+        gl.glTranslate(-0.5,-0.5,-1.5)
+        gl.glRotate(45.,.0,-1.0,0.0)
+
+        gl.glMatrixMode(gl.GL_MODELVIEW)
+        gl.glLoadIdentity()
+
+        if self.ts.dat_s != None:
+            self.img_s = glumpy.image.Image(spect, colormap=self.colormap)
+            self.img_s.update()
+            self.img_s.draw( x=0, y=0, z=0, width=1, height=1)
         self.fig.unlock()
 
 
