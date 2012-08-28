@@ -7,9 +7,13 @@ import numpy as np
 import pywt
 from pytfd import stft
 
+from datetime import datetime
+
 class TimeSeries():
-    window_size = 64
+    window_size = 128
     buffer_len = 512
+    frame_rate = 256.0
+    zoom = 16
 
     def __init__(self, feed_func):
         # Actual time series buffer
@@ -21,15 +25,22 @@ class TimeSeries():
 
         self.feed_func = feed_func
         self.window = np.ones(self.window_size)
+        self.update_time = datetime.now()
+
+        self.freqs = np.fft.fftfreq(self.window_size) * self.frame_rate / self.zoom
 
     def eat(self):
         newdata = self.feed_func()
-        self.series = np.append(self.series[len(newdata):], newdata)
+
+        # take every n-th
+        zoomed = newdata[::self.zoom]
+        self.series = np.append(self.series[len(zoomed):], zoomed)
 
         assert len(self.series) == self.buffer_len
-        self.update(len(newdata))
+        self.update(len(zoomed))
 
     def update(self, n):
+        self.update_time = datetime.now()
         self.dat_s = np.roll(self.dat_s, -n)
         self.update_w(n)
         self.update_s(n)
@@ -37,7 +48,7 @@ class TimeSeries():
     def update_w(self, n):
         " Update wavelet transform data "
         level = 5
-        wp = pywt.WaveletPacket(self.series, 'coif2', 'sym', maxlevel=level)
+        wp = pywt.WaveletPacket(self.series, 'coif4', 'sym', maxlevel=level)
         nodes = wp.get_level(level, order='freq')
         values = np.abs(np.array([nx.data for nx in nodes]))
         self.dat_w = np.clip(values, 0.0, 0.3)
@@ -51,6 +62,9 @@ class TimeSeries():
         newpart = np.clip(newpart, 0.0, 2.0)
         newpart = np.flipud(newpart) # TODO: do this during the visualisation
         self.dat_s[:,-c:] = newpart[:,-c:]
+
+    def samples_since_last_update(self):
+        return (datetime.now() - self.update_time).microseconds / 100.0
 
 if __name__ == '__main__':
     from feeders import random_sinoids

@@ -110,6 +110,7 @@ class Image(object):
             corner.
         '''
 
+        self.Z = Z
         self._texture = Texture(Z)
         if self._texture.dst_format in [gl.GL_RGB, gl.GL_RGBA]:
             colormap = None
@@ -219,8 +220,26 @@ class Image(object):
         mx, my = np.mgrid[0:n,0:n]/float(n-1)
         self._vertices['position']['x'] = x + width * mx
         self._vertices['position']['y'] = y + height*(1-my)
-        self._vertices['position']['z'] = z
+
+        from math import floor
+        
+        #print self._vertices['position']['z'].shape , 
+        stretchx = lambda x: int(floor(x / float(n) * self.Z.shape[0]))
+        stretchy = lambda y: int(floor(y / float(n) * self.Z.shape[1]))
+
+        if 1:#self._vertices['position']['z'].shape == self.Z.shape:
+            for xp in range(0,n):
+                for yp in range(0,n):
+                    self._vertices['position']['z'][xp][yp] = self.Z[stretchx(xp)][stretchy(yp)] * 0.2
+            self._vertices['position']['z'] = np.transpose(self._vertices['position']['z'])
+#, self._vertices['position']['z'].shape) * 0.8 # + np.sin((my * 20.0)) / 20.0 + np.cos((mx * 6.0)+0.2) / 20.0
+
+        else:
+            self._vertices['position']['z'] = 0
+
         self._mesh.upload()
         self._mesh.draw()
 
         self._filter.deactivate( )
+
+

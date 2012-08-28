@@ -43,7 +43,7 @@ def mk_modeeg(f):
     def stdin_read():
         x = []
         leftover = None
-        for i in range(30): # Limit to 30 frames per call, FIXME
+        for i in range(256): # Limit to 256 frames per call FIXME
             data = inbuf.read(MODEEG_PKTLEN)
             if data is None or len(data) < MODEEG_PKTLEN:
                 leftover = data
@@ -54,6 +54,7 @@ def mk_modeeg(f):
                 continue
             x.append(info)
         # TODO: BufferedReader what?! make use of leftover!
-        return [(info[4] - 512) / 1024.0 for info in x[:300]]
+        y = [(info[4] - 512) / 1024.0 for info in x[:300]]
+        return y
     return stdin_read
 

@@ -5,7 +5,7 @@ Dantien application
 from itertools import product
 import glumpy
 
-def dantien(feed_func, layout, update_rate=20):
+def dantien(feed_func, layout, update_rate=5):
     ts = TimeSeries(feed_func)
 
     cols = len(layout[0])
@@ -20,6 +20,9 @@ def dantien(feed_func, layout, update_rate=20):
     @fig.timer(update_rate)
     def update(_):
         ts.eat()
+
+    @fig.event('on_idle')
+    def idle(_):
         fig.redraw()
 
     glumpy.show()
@@ -27,7 +30,7 @@ def dantien(feed_func, layout, update_rate=20):
 if __name__ == '__main__':
     import sys
     from views import Cube, Spectrogram, SeriesPlot, FFTPlot, \
-            Spectrogram3D, Scaleogram, Blank as _
+            Spectrogram3D, Scaleogram, Blank as _, SpectrogramAxis
     from model import TimeSeries
     import feeders
 
@@ -37,9 +40,9 @@ if __name__ == '__main__':
         feed = feeders.random_positive_sinoids
 
     layout = [
-        [FFTPlot, SeriesPlot],
-        [Spectrogram3D, Spectrogram],
-        [Spectrogram3D, Scaleogram],
+#        [FFTPlot, SeriesPlot],
+        [SpectrogramAxis, Spectrogram],
+#        [Spectrogram3D, _], #Scaleogram],
     ]
 
     dantien(feed, layout)

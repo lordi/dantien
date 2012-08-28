@@ -71,7 +71,13 @@ from glfreetype import glFreeType
 class SpectrogramAxis(BaseView):
     colormap = glumpy.colormap.Hot
     text_vertical_dist = 25.0
-    text_size = 14
+    text_size = 12
+    brainwaves = [
+            ('delta', 0.5, 4.0),
+            ('theta', 4.0, 8.0),
+            ('alpha', 8.0, 14.0),
+            ('beta', 14.0, 30.0)
+        ]
 
     def __init__(self, fig, ts, size=0.5, colormap=None):
         self.fig = fig
@@ -89,13 +95,24 @@ class SpectrogramAxis(BaseView):
         gl.glLoadIdentity ()
 
         for i in np.arange(0.,1.,self.text_vertical_dist/self.fig.height):
-            freq = self.freqs[int(i*self.window_len/2)]
+            freq = self.ts.freqs[int(i*self.ts.window_size/2)]
+            # i * self.ts.window_size / 2 
             self.font.glPrint (self.fig.width-100, self.fig.height * i, "{0:.2f} Hz".format(freq))
+
+        y = 0
+        for name, low, high in self.brainwaves:
+            y += 0.1
+            center = (low + high) / 2.0
+            #freq = self.ts.freqs[int(i*self.ts.window_size/2)]
+            ypos = y
+            self.font.glPrint (self.fig.width - 200, self.fig.height * ypos, name)
         self.fig.unlock()
 
 
 class Spectrogram(object):
     colormap = glumpy.colormap.Hot
+    text_size = 12
+    num_freqs = 10
 
     def __init__(self, fig, ts, size=0.5, colormap=None):
         self.fig = fig
@@ -106,25 +123,38 @@ class Spectrogram(object):
     def on_draw(self):
         self.fig.lock()
         self.fig.clear(*THEME_BG)
+
         if self.ts.dat_s != None:
             self.img_s = glumpy.image.Image(self.ts.dat_s.astype(np.float32), colormap=self.colormap)
             self.img_s.update()
-            self.img_s.draw( x=0, y=0, z=0, width=self.fig.width, height=self.fig.height )
+            self.img_s.draw( x=-self.ts.samples_since_last_update()/self.ts.buffer_len, y=0, z=0, width=self.fig.width, height=self.fig.height )
+
+        gl.glLoadIdentity ()
+        #print self.ts.freqs
+        for i in np.arange(0.,1.,1.0/self.num_freqs):
+            freq = self.ts.freqs[int(i*self.ts.window_size/2)]
+            #print i *100
+            #self.font.glPrint (0, 0, "{0:.2f} Hz".format(freq))
+
         self.fig.unlock()
 
 
 class Spectrogram3D(Spectrogram):
+    i = 0
     def on_draw(self):
         self.fig.lock()
         self.fig.clear(*THEME_BG)
         spect = self.ts.dat_s.astype(np.float32)
 
+        self.i = self.i + 1
+        xxx = np.sin(self.i/30.0)
+
         gl.glMatrixMode(gl.GL_PROJECTION)
         gl.glLoadIdentity()
         glu.gluPerspective(400.0, self.fig.width / float(self.fig.height), .01, 10000)
         gl.glRotate(-90.,.0,0.0,1.0)
-        gl.glTranslate(-0.5,-0.5,-1.5)
-        gl.glRotate(45.,.0,-1.0,0.0)
+        gl.glTranslate(-0.5,-0.5,-2.0-xxx*0.25)#+np.cos(self.i/20.0)/10.0)
+        gl.glRotate(55.+xxx*10,.0,-1.0,0.0)
 
         gl.glMatrixMode(gl.GL_MODELVIEW)
         gl.glLoadIdentity()
@@ -153,7 +183,7 @@ class Scaleogram(BaseView):
                     interpolation='bilinear',
                     colormap=self.colormap)
             self.img_s.update()
-            self.img_s.draw( x=0, y=0, z=0, width=self.fig.width, height=self.fig.height )
+            self.img_s.draw( x=-self.ts.samples_since_last_update()*self.fig.width*0.00002 , y=0, z=0, width=self.fig.width, height=self.fig.height )
         self.fig.unlock()
 
 
